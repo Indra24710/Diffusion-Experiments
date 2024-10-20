@@ -1,0 +1,30 @@
+dataset:
+  batch_size: 8
+  num_workers: 4
+experiment:
+  log_root_dir: logs
+  seed: 1000
+  use_tensorboard: true
+model:
+  generation:
+    num_inference_steps: 50
+  inverse_scheduler: inverse_scheduler
+  inversion:
+    lr: 1e-3
+    num_inference_steps: 50
+    optimization_steps: 150
+  name: ldm-celebahq-256
+  root: CompVis/ldm-celebahq-256
+  scheduler:
+    beta_end: 0.0195
+    beta_schedule: scaled_linear
+    beta_start: 0.0015
+    clip_sample: false
+    trained_betas: null
+  type: unconditional
+  unet: unet
+  vqvae: vqvae
+other_experiment_info:
+  name: 2024-10-20_ldm-celebahq-256_expt-1_vanilla-image-generation
+  num_images: 10
+  path: ./experiments/generation/2024-10-20_ldm-celebahq-256_expt-1_vanilla-image-generation

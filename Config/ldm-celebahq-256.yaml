@@ -1,0 +1,28 @@
+dataset:
+  batch_size: 8
+  num_workers: 4
+
+model:
+  name: "ldm-celebahq-256"
+  type: "unconditional"
+  root: "CompVis/ldm-celebahq-256"
+  unet: "unet"
+  vqvae: "vqvae"
+  scheduler:
+    "beta_end": 0.0195
+    "beta_schedule": "scaled_linear"
+    "beta_start": 0.0015
+    "clip_sample": false
+    "trained_betas": null
+  inverse_scheduler: "inverse_scheduler"
+  generation:
+    num_inference_steps: 50
+  inversion:
+    num_inference_steps: 50
+    optimization_steps: 150
+    lr: 1e-3
+
+experiment:
+  log_root_dir: "logs"
+  seed: 1000
+  use_tensorboard: true

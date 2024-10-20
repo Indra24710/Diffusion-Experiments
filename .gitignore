@@ -1,0 +1,27 @@
+# Ignore dataset files
+Data/Datasets/*
+
+# Ignore generated images and latents from experiments
+Experiments/generation/*/images/
+Experiments/generation/*/latents/
+
+# Ignore Python egg-info metadata
+diffusion_project.egg-info
+
+# Common additions
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+*.log
+*.tmp
+*.DS_Store
+*.idea*
+
+# Virtual environment
+env/
+venv/
+
+# Temp files
+rand.py
+.gitmessage
