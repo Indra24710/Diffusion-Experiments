@@ -22,16 +22,16 @@ def load_model_files(model_cfg, device, inversion=False):
             scheduler_config = model_cfg["scheduler"]
             scheduler = DDIMScheduler(**scheduler_config)
 
-            # Return inverse scheduler as well if invert is set to true
+            # Return inverse scheduler as well if inversion is set to true
             if inversion:
-                from diffusers.schedulers.scheduling_ddim import DDIMInverseScheduler
-
-                inverse_scheduler = DDIMInverseScheduler.from_pretrained(
-                    model_root, subfolder=model_cfg["scheduler"]
+                from diffusers.schedulers.scheduling_ddim_inverse import (
+                    DDIMInverseScheduler,
                 )
-                return vqvae, unet, scheduler, inverse_scheduler
 
-            return vqvae, unet, scheduler
+                inverse_scheduler = DDIMInverseScheduler(**scheduler_config)
+                return unet, vqvae, scheduler, inverse_scheduler
+
+            return unet, vqvae, scheduler
 
         case _:
             logging.error("Model setup information not available for: {model_name}")

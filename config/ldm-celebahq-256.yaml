@@ -1,6 +1,8 @@
 dataset:
-  batch_size: 8
+  path: "D:\\AI projects\\Diffusion-Experiments\\experiments\\generation\\2024-10-20_ldm-celebahq-256_expt-1_vanilla-image-generation\\images"
   num_workers: 4
+  filetype: "png"
+  dataset_type: "vanilla"
 
 model:
   name: "ldm-celebahq-256"
@@ -23,6 +25,10 @@ model:
     lr: 1e-3
 
 experiment:
+  expt_type: "ddim_inversion" # ddim_inversion, hybrid_inversion, optimization_inversion
   log_root_dir: "logs"
   seed: 1000
   use_tensorboard: true
+  batch_size: 1
+  shuffle_dataset: true
+  num_files: 10

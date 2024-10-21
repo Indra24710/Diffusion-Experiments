@@ -1,9 +1,15 @@
 dataset:
-  batch_size: 8
+  dataset_type: vanilla
+  filetype: png
   num_workers: 4
+  path: D:\AI projects\Diffusion-Experiments\experiments\generation\2024-10-20_ldm-celebahq-256_expt-1_vanilla-image-generation\images
 experiment:
+  batch_size: 1
+  expt_type: ddim_inversion
   log_root_dir: logs
+  num_files: 10
   seed: 1000
+  shuffle_dataset: true
   use_tensorboard: true
 model:
   generation:
@@ -25,6 +31,5 @@ model:
   unet: unet
   vqvae: vqvae
 other_experiment_info:
-  name: 2024-10-20_ldm-celebahq-256_expt-1_vanilla-image-generation
-  num_images: 10
-  path: ./experiments/generation/2024-10-20_ldm-celebahq-256_expt-1_vanilla-image-generation
+  name: 2024-10-20_ldm-celebahq-256_expt-1_vanilla-ddim-inversion
+  path: ./experiments/inversion/2024-10-20_ldm-celebahq-256_expt-1_vanilla-ddim-inversion

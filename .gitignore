@@ -1,9 +1,9 @@
 # Ignore dataset files
-Data/Datasets/*
+data/datafiles/*
 
 # Ignore generated images and latents from experiments
-Experiments/generation/*/images/
-Experiments/generation/*/latents/
+experiments/generation/*/images/
+experiments/generation/*/latents/
 
 # Ignore Python egg-info metadata
 diffusion_project.egg-info

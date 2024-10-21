@@ -1,11 +1,11 @@
 import argparse
 import torch
-from generation.generate import GenerateImages
-from utils import load_config, save_config
-from models.get_models import load_model_files
+from inversion.ddim_inversion import DDIMInversion
+from utils import load_config, save_config, get_dataloader
 from datetime import datetime
 import logging
 import os
+from models.get_models import load_model_files
 
 
 # Set up logging
@@ -17,13 +17,10 @@ def setup_logging():
 
 def parse_args():
     parser = argparse.ArgumentParser(
-        description="Image generation using diffusion models"
+        description="Image inversion using diffusion models"
     )
     parser.add_argument(
         "--config", type=str, required=True, help="Path to the config file"
-    )
-    parser.add_argument(
-        "--num_images", type=int, default=1, help="Number of images to generate"
     )
     parser.add_argument(
         "--expt_name",
@@ -47,7 +44,7 @@ if __name__ == "__main__":
     device = "cuda" if torch.cuda.is_available() else "cpu"
     date_str = datetime.now().strftime("%Y-%m-%d")
     experiment_name = date_str + "_" + args.expt_name
-    output_dir = os.path.join("./experiments/generation/" + experiment_name)
+    output_dir = os.path.join("./experiments/inversion/" + experiment_name)
     if not os.path.exists(output_dir):
         os.makedirs(output_dir)
 
@@ -55,12 +52,23 @@ if __name__ == "__main__":
     cfg["other_experiment_info"] = {}
     cfg["other_experiment_info"]["name"] = experiment_name
     cfg["other_experiment_info"]["path"] = output_dir
-    cfg["other_experiment_info"]["num_images"] = args.num_images
     save_config(cfg, os.path.join(output_dir, "expt_config.yml"))
 
-    # Call generate function
-    logging.info("Calling generate function")
-    torch.manual_seed(cfg["experiment"]["seed"])
-    model_artifacts = load_model_files(cfg["model"], device)
-    genImagesObject = GenerateImages(cfg, model_artifacts, device, output_dir)
-    genImagesObject.run_generation()
+    # load image dataset
+    dataloader = get_dataloader(cfg)
+
+    expt_type = cfg["experiment"]["expt_type"]
+    logging.info(f"Experiment type: {expt_type}")
+    match expt_type:
+        case "ddim_inversion":
+            # Create ddim inversion object
+            model_artifacts = load_model_files(cfg["model"], device, inversion=True)
+            ddimInversionObj = DDIMInversion(cfg, model_artifacts, device, output_dir)
+
+            # Call inv function
+            logging.info("Calling inversion runner")
+            torch.manual_seed(cfg["experiment"]["seed"])
+            ddimInversionObj.run_ddim_inversion_loop(dataloader)
+
+        case _:
+            logging.error("Unknown inversion type")
