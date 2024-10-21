@@ -4,6 +4,8 @@ data/datafiles/*
 # Ignore generated images and latents from experiments
 experiments/generation/*/images/
 experiments/generation/*/latents/
+experiments/inversion/*/images/
+experiments/inversion/*/latents/
 
 # Ignore Python egg-info metadata
 diffusion_project.egg-info
