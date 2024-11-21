@@ -29,14 +29,8 @@ class GenerateImages:
         match model_name:
             case "ldm-celebahq-256":
                 # Sample initial noise
-                initial_seed_latent = torch.randn(
-                    (
-                        1,
-                        self.unet.config.in_channels,
-                        self.unet.sample_size,
-                        self.unet.sample_size,
-                    )
-                )
+                initial_seed_latent = torch.randn((1, 4, 32, 32))
+                print("seed latent shape:- ", initial_seed_latent.shape)
                 latents = initial_seed_latent.clone().to(self.device)
 
                 # Run denoising loop
@@ -55,15 +49,19 @@ class GenerateImages:
                 num_images = self.config["experiment"]["num_files"]
                 logging.info(f"Generating {num_images} images")
                 for i in tqdm(range(num_images)):
-                    image, initial_seed_latent = self.unconditional_generation(
-                        model_name
-                    )
+                    with torch.no_grad():
+                        image, initial_seed_latent = self.unconditional_generation(
+                            model_name
+                        )
 
-                    # Process and save the image and initial seed latents
-                    index = "0" * (len(str(num_images)) - len(str(i))) + str(i)
-                    process_and_save_expt_artifacts(
-                        model_name, [image, initial_seed_latent], self.output_dir, index
-                    )
+                        # Process and save the image and initial seed latents
+                        index = "0" * (len(str(num_images)) - len(str(i))) + str(i)
+                        process_and_save_expt_artifacts(
+                            model_name,
+                            [image, initial_seed_latent],
+                            self.output_dir,
+                            index,
+                        )
 
             case _:
                 logging.error(f"Unsupported generation type : {self.model_cfg['type']}")

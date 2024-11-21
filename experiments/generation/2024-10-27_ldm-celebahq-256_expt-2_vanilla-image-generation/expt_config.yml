@@ -31,5 +31,6 @@ model:
   unet: unet
   vqvae: vqvae
 other_experiment_info:
-  name: 2024-10-20_ldm-celebahq-256_expt-2_vanilla-ddim-inversion
-  path: ./experiments/inversion/2024-10-20_ldm-celebahq-256_expt-2_vanilla-ddim-inversion
+  name: 2024-10-27_ldm-celebahq-256_expt-2_vanilla-image-generation
+  num_images: 10
+  path: ./experiments/generation/2024-10-27_ldm-celebahq-256_expt-2_vanilla-image-generation

@@ -1,0 +1,53 @@
+dataset:
+  dataset_type: vanilla
+  filetype: png
+  num_workers: 4
+  path: D:\AI projects\Diffusion-Experiments\data\datafiles\celebahq_subset
+experiment:
+  batch_size: 1
+  expt_type: hybrid_ddim_inversion
+  log_root_dir: logs
+  num_files: 6
+  seed: 1000
+  shuffle_dataset: false
+  use_tensorboard: true
+model:
+  generation:
+    num_inference_steps: 50
+  inverse_scheduler: inverse_scheduler
+  inversion:
+    loss:
+      l1_img_loss: true
+      l1_perceptual_loss: false
+      l1_weight: 1
+      l2_img_loss: false
+      l2_perceptual_loss: true
+      l2_perceptual_loss_weight: 1
+      l2_weight: 1
+      normality_loss_weight: 1
+      threshold: 0.0035
+    lr: 1e-3
+    num_inference_steps: 50
+    optimization_steps: 100
+    optimizer:
+      name: adam
+      params:
+        betas:
+        - 0.9
+        - 0.999
+        lr: 0.001
+  name: ldm-celebahq-256
+  root: CompVis/ldm-celebahq-256
+  scheduler:
+    beta_end: 0.0195
+    beta_schedule: scaled_linear
+    beta_start: 0.0015
+    clip_sample: false
+    trained_betas: null
+  type: unconditional
+  unet: unet
+  vqvae: vqvae
+other_experiment_info:
+  name: 2024-11-17_ldm-celebahq-256_expt-10_vanilla-hybrid-ddim-inversion
+  path: ./experiments/inversion/2024-11-17_ldm-celebahq-256_expt-10_vanilla-hybrid-ddim-inversion
+  tensorboard_logs_path: ./experiments/inversion/2024-11-17_ldm-celebahq-256_expt-10_vanilla-hybrid-ddim-inversion\tensorboard_logs

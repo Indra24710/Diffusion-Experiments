@@ -1,0 +1,1 @@
+This experiment uses perceptual loss alone and enforces normality using population k2 loss. It uses K2 test for normality to check if the latents are normal or not

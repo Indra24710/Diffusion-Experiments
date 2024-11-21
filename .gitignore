@@ -6,6 +6,8 @@ experiments/generation/*/images/
 experiments/generation/*/latents/
 experiments/inversion/*/images/
 experiments/inversion/*/latents/
+experiments/inversion/*/tensorboard_logs/
+experiments/inversion/*/experiment_info.txt/
 
 # Ignore Python egg-info metadata
 diffusion_project.egg-info
@@ -27,3 +29,5 @@ venv/
 # Temp files
 rand.py
 .gitmessage
+evaluation/*
+temp_utils

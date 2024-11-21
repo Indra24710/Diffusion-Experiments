@@ -1,0 +1,1 @@
+This experiment uses perceptual loss alone without enforcing normality. It uses K2 test for normality to check if the latents are normal or not. Here the latents are not standardized during the optimization steps
