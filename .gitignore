@@ -30,4 +30,4 @@ venv/
 rand.py
 .gitmessage
 evaluation/*
-temp_utils
+temp_utils/*
