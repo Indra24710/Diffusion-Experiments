@@ -1,6 +1,10 @@
 import os
 import logging
-from utils import process_and_save_expt_artifacts, standardize_tensor
+from utils import (
+    process_and_save_expt_artifacts,
+    standardize_tensor,
+    construct_artifacts,
+)
 import torch
 from generation.generation_utils import run_denoising_loop
 from tqdm import tqdm
@@ -56,7 +60,7 @@ class DDIMInversion:
                     model_name, [self.unet, self.vqvae, self.scheduler], latents
                 )
 
-                return [reconstructed_image], [latents], None
+                return reconstructed_image, latents
 
             case _:
                 logging.error(f"Unsupported model: {model_name}")
@@ -83,9 +87,8 @@ class DDIMInversion:
                         image_tensor = image_tensor.to(self.device)
 
                         (
-                            images,
-                            latents,
-                            _,
+                            final_recon_image,
+                            final_ddim_inv_latents,
                         ) = self.unconditional_ddim_inversion(model_name, image_tensor)
 
                         # Process and save the inverted image and latents
@@ -93,11 +96,20 @@ class DDIMInversion:
                         index = image_name.split("_")[-1].split(".")[
                             0
                         ]  # Extract the index from filename
+
+                        output_artifact_images = {
+                            "final_recon_image": final_recon_image
+                        }
+                        output_artifact_latents = {
+                            "final_ddim-inv_latents": final_ddim_inv_latents.detach()
+                            .cpu()
+                            .numpy()
+                        }
+                        output_artifacts = construct_artifacts(
+                            output_artifact_images, output_artifact_latents
+                        )
                         process_and_save_expt_artifacts(
-                            model_name,
-                            [images, latents, None],
-                            self.output_dir,
-                            index,
+                            output_artifacts, self.output_dir, index, self.config
                         )
 
             case _:

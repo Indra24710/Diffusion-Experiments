@@ -2,8 +2,9 @@ import os
 import logging
 from utils import (
     process_and_save_expt_artifacts,
-    standardize_tensor,
     is_standard_normal_k2,
+    construct_artifacts,
+    standardize_tensor,
 )
 import torch
 from tqdm import tqdm
@@ -41,15 +42,12 @@ class HybridDDIMInversion:
                 # Setup for TensorBoard logging
                 with torch.no_grad():
                     (
-                        initial_ddim_inversion_image_li,
-                        initial_ddim_inversion_latents_li,
-                        _,
+                        initial_ddim_inversion_image,
+                        initial_ddim_inversion_latents,
                     ) = self.ddimInversionObj.unconditional_ddim_inversion(
                         model_name, target_image_tensor
                     )
 
-                initial_ddim_inversion_latents = initial_ddim_inversion_latents_li[0]
-                initial_ddim_inversion_image = initial_ddim_inversion_image_li[0]
                 logging.info(
                     f"Is initial latents from DDIM Inversion normal:- {is_standard_normal_k2(initial_ddim_inversion_latents.detach().cpu())[0]}"
                 )
@@ -80,7 +78,7 @@ class HybridDDIMInversion:
                     range(self.model_cfg["inversion"]["optimization_steps"])
                 ):
                     with torch.no_grad():
-                        # opt_latents.copy_(normalize_tensor(opt_latents))
+                        # opt_latents.copy_(standardize_tensor(opt_latents))
                         is_normal, is_normal_delta = is_standard_normal_k2(
                             opt_latents.detach().cpu()
                         )
@@ -116,7 +114,10 @@ class HybridDDIMInversion:
                         [target_image_features, reconstructed_image_features],
                     )
 
-                    logging.info(f"epoch :- {epoch} loss :- {total_loss}")
+                    logging.info(f"epoch :- {epoch} loss :- {total_loss.item()}")
+
+                    for name, loss_value in loss_details.items():
+                        self.writer.add_scalar(name, loss_value, epoch)
 
                     is_normal, is_normal_delta = is_standard_normal_k2(
                         opt_latents.detach().cpu()
@@ -124,8 +125,18 @@ class HybridDDIMInversion:
 
                     if is_normal:
                         normal_latents.append(
-                            [epoch, total_loss, opt_latents.detach().cpu().numpy()]
+                            [
+                                epoch,
+                                total_loss.item(),
+                                opt_latents.detach().cpu().numpy(),
+                            ]
                         )
+
+                    if (
+                        total_loss < self.model_cfg["inversion"]["loss_threshold"]
+                        and is_normal
+                    ):
+                        break
 
                     optimizer.zero_grad(set_to_none=True)
                     total_loss.backward()
@@ -135,7 +146,11 @@ class HybridDDIMInversion:
                 with torch.no_grad():
                     # Generate image using the latents which are normal and which also has the smallest total loss value
                     if len(normal_latents) > 0:
+                        logging.info("Using best normal latents for final generation")
                         normal_latents.sort(key=lambda x: (x[1], -x[0]))
+                        seed_latents = standardize_tensor(
+                            torch.from_numpy(normal_latents[0][2])
+                        )
                         (
                             final_reconstructed_image,
                             final_reconstructed_image_latents,
@@ -146,18 +161,21 @@ class HybridDDIMInversion:
                                 self.ddimInversionObj.vqvae,
                                 self.ddimInversionObj.scheduler,
                             ],
-                            torch.from_numpy(normal_latents[0][2]).to(self.device),
+                            seed_latents.to(self.device),
                         )
                         self.writer.close()
                         return (
                             final_reconstructed_image,
                             initial_ddim_inversion_image,
-                            normal_latents,
+                            seed_latents.detach().cpu().numpy(),
                             final_reconstructed_image_latents,
                             initial_ddim_inversion_latents,
                             loss_map,
                         )
                     else:
+                        logging.info(
+                            "Using opt_latents from last step for final generation"
+                        )
                         (
                             final_reconstructed_image,
                             final_reconstructed_image_latents,
@@ -227,18 +245,23 @@ class HybridDDIMInversion:
                     index = image_name.split("_")[-1].split(".")[
                         0
                     ]  # Extract the index from filename
+
+                    # Construct experiment output artifacts
+                    output_artifact_images = {
+                        "final_recon_image": reconstructed_image,
+                        "init_ddim-inv_image": initial_ddim_inversion_image,
+                    }
+                    output_artifact_latents = {
+                        "normal_latents": normal_latents,
+                        "init_ddim-inv_latents": initial_ddim_inversion_latents.detach()
+                        .cpu()
+                        .numpy(),
+                    }
+                    output_artifacts = construct_artifacts(
+                        output_artifact_images, output_artifact_latents, loss_map
+                    )
                     process_and_save_expt_artifacts(
-                        model_name,
-                        [
-                            [reconstructed_image, initial_ddim_inversion_image],
-                            [
-                                normal_latents,
-                                initial_ddim_inversion_latents.detach().cpu().numpy(),
-                            ],
-                            loss_map,
-                        ],
-                        self.output_dir,
-                        index,
+                        output_artifacts, self.output_dir, index, self.config
                     )
 
             case _:

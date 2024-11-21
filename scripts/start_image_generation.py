@@ -23,14 +23,17 @@ def parse_args():
         "--config", type=str, required=True, help="Path to the config file"
     )
     parser.add_argument(
-        "--num_images", type=int, default=1, help="Number of images to generate"
-    )
-    parser.add_argument(
         "--expt_name",
         type=str,
         required=True,
         help="Name of the experiment. Format:- modelname_experimentcount_someinfo. "
         "Example:- ldm-celebahq-256_expt-1_vanilla-image-generation",
+    )
+    parser.add_argument(
+        "--experiment_info",
+        type=str,
+        required=True,
+        help="A brief description or notes about the experiment.",
     )
     return parser.parse_args()
 
@@ -55,8 +58,12 @@ if __name__ == "__main__":
     cfg["other_experiment_info"] = {}
     cfg["other_experiment_info"]["name"] = experiment_name
     cfg["other_experiment_info"]["path"] = output_dir
-    cfg["other_experiment_info"]["num_images"] = args.num_images
     save_config(cfg, os.path.join(output_dir, "expt_config.yml"))
+
+    # Write the experiment info to a file
+    output_file = os.path.join(output_dir, "experiment_info.txt")
+    with open(output_file, "w") as f:
+        f.write(args.experiment_info)
 
     # Call generate function
     logging.info("Calling generate function")

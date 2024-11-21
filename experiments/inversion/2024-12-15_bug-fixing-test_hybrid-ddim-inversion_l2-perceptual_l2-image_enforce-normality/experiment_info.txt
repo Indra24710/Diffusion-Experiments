@@ -1,0 +1,1 @@
+This experiment runs hybrid-ddim-inversion with l2 perceptual loss, l2 image loss and enforces population based K2 normality loss on 10 files for maximum 100 optimization steps.
