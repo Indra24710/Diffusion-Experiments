@@ -15,6 +15,7 @@ class DDIMInversion:
         self.output_dir = output_dir
 
     def load_model_artifacts(self, model_name):
+        # Request model artifacts from the helper function based on model name
         match model_name:
             case "ldm-celebahq-256":
                 (
@@ -36,9 +37,11 @@ class DDIMInversion:
         match model_name:
             case "ldm-celebahq-256":
                 image_tensor = image_tensor
-                # Encode to latents
+
+                # Encode image to latents
                 latents = self.vqvae.encode(image_tensor).latents
-                # Inversion loop
+
+                # Vanilla DDIMInversion loop to get the initial noise from the latents
                 for t in reversed(self.inverse_scheduler.timesteps):
                     # Predict noise residual
                     noise_pred = self.unet(latents, t).sample
@@ -48,7 +51,7 @@ class DDIMInversion:
                         noise_pred, t, latents
                     ).prev_sample
 
-                # Use the learned noise to run DDIM generation to get reconstructed image
+                # Use the learned noise tensor to run DDIM generation to get reconstructed image
                 reconstructed_image, reconstructed_image_latent = run_denoising_loop(
                     model_name, [self.unet, self.vqvae, self.scheduler], latents
                 )
@@ -61,6 +64,8 @@ class DDIMInversion:
     def run_ddim_inversion_loop(self, dataloader):
         model_cfg = self.config["model"]
 
+        # Call the right vanilla ddim-inversion process (unconditional/class-conditioned/text-conditioned) based on
+        # model config type
         match model_cfg["type"]:
             case "unconditional":
                 model_name = model_cfg["name"]
@@ -70,6 +75,7 @@ class DDIMInversion:
                     f"Starting Unconditional DDIM inversion with {steps} steps"
                 )
 
+                # Call unconditional inversion on each image sample you want to invert
                 for image_tensor, image_path in tqdm(
                     dataloader, desc="Inverting images", unit="image"
                 ):

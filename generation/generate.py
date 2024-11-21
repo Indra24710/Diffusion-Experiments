@@ -15,6 +15,7 @@ class GenerateImages:
         self.load_model_artifacts(self.model_cfg["name"])
 
     def load_model_artifacts(self, model_name):
+        # Request model artifacts from the helper function based on model name
         match model_name:
             case "ldm-celebahq-256":
                 self.unet, self.vqvae, self.scheduler = self.model_artifacts
@@ -27,13 +28,14 @@ class GenerateImages:
 
     def unconditional_generation(self, model_name):
         match model_name:
+            # Call the right diffusion model generation algorithm based on model name
             case "ldm-celebahq-256":
-                # Sample initial noise
+                # Sample initial noise vector which will act as the seed for the image generation process
                 initial_seed_latent = torch.randn((1, 4, 32, 32))
                 print("seed latent shape:- ", initial_seed_latent.shape)
                 latents = initial_seed_latent.clone().to(self.device)
 
-                # Run denoising loop
+                # Run denoising loop on the sampled noise vector
                 image, _ = run_denoising_loop(
                     model_name, [self.unet, self.vqvae, self.scheduler], latents
                 )
@@ -43,6 +45,8 @@ class GenerateImages:
                 logging.error(f"Unsupported model: {model_name}")
 
     def run_generation(self):
+        # Call the right generation process (unconditional/class-conditioned/text-conditioned) based on
+        # model config type
         match self.model_cfg["type"]:
             case "unconditional":
                 model_name = self.model_cfg["name"]
@@ -50,6 +54,7 @@ class GenerateImages:
                 logging.info(f"Generating {num_images} images")
                 for i in tqdm(range(num_images)):
                     with torch.no_grad():
+                        # Call unconditional image generation process
                         image, initial_seed_latent = self.unconditional_generation(
                             model_name
                         )

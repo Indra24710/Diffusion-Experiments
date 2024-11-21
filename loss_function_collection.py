@@ -4,6 +4,7 @@ import torch.nn.functional as F
 import logging
 
 
+# Custom loss function class to test different combinations of loss functions for custom experiments
 class LossFunctionCollection:
     def __init__(self):
         self.loss_functions = {}
@@ -90,7 +91,7 @@ class LossFunctionCollection:
 
     # Define custom losses
 
-    # Checks normality based on D'Agostino Pearson sample normality test
+    # Enforces normality in generated latents based on D'Agostino Pearson sample normality test
     def compute_sample_k2_loss(sample):
         n = sample.numel()
 

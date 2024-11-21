@@ -8,7 +8,6 @@ def init_optimizer(config, tensor):
             optimizer = torch.optim.Adam(
                 [tensor], **config["inversion"]["optimizer"]["params"]
             )
-
         case _:
             logging.ERROR(
                 f"Unsupported optimizer {config['inversion']['optimizer']['name']}"

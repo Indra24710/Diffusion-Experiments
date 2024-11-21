@@ -9,6 +9,7 @@ import torchvision.transforms as T
 # Dataset for loading images
 class ImagesDataset(Dataset):
     def __init__(self, image_dir, data_config, num_files=1):
+        # Load all images if num_files in config is equal to no of images in input folder
         if len(os.listdir(image_dir)) == num_files:
             self.image_paths = [
                 os.path.join(image_dir, f)
@@ -16,6 +17,7 @@ class ImagesDataset(Dataset):
                 if f.endswith(data_config["filetype"])
             ]
         else:
+            # Randomly samply 'num_files' no of images from the input_folder
             self.image_paths = random.sample(
                 [
                     os.path.join(image_dir, f)

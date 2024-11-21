@@ -1,11 +1,13 @@
 import logging
 
 
+# Denoising loop for diffusion models
 def run_denoising_loop(model_name, model_artifacts, latents):
     match model_name:
         case "ldm-celebahq-256":
             unet, vqvae, scheduler = model_artifacts
-            # Denoising loop
+
+            # Denoising loop for unconditional generation
             for t in scheduler.timesteps:
                 # Predict noise residual
                 noise_pred = unet(latents, t).sample
