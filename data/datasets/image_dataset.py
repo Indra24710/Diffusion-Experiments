@@ -10,7 +10,7 @@ import torchvision.transforms as T
 class ImagesDataset(Dataset):
     def __init__(self, image_dir, data_config, num_files=1):
         # Load all images if num_files in config is equal to no of images in input folder
-        if len(os.listdir(image_dir)) == num_files:
+        if len(os.listdir(image_dir)) <= num_files:
             self.image_paths = [
                 os.path.join(image_dir, f)
                 for f in os.listdir(image_dir)

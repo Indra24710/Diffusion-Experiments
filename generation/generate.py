@@ -1,5 +1,5 @@
 import torch
-from utils import process_and_save_expt_artifacts
+from utils import process_and_save_expt_artifacts, construct_artifacts
 import logging
 from tqdm import tqdm
 from generation.generation_utils import run_denoising_loop
@@ -31,7 +31,14 @@ class GenerateImages:
             # Call the right diffusion model generation algorithm based on model name
             case "ldm-celebahq-256":
                 # Sample initial noise vector which will act as the seed for the image generation process
-                initial_seed_latent = torch.randn((1, 4, 32, 32))
+                initial_seed_latent = torch.randn(
+                    (
+                        1,
+                        self.unet.in_channels,
+                        self.unet.sample_size,
+                        self.unet.sample_size,
+                    )
+                )
                 print("seed latent shape:- ", initial_seed_latent.shape)
                 latents = initial_seed_latent.clone().to(self.device)
 
@@ -61,12 +68,20 @@ class GenerateImages:
 
                         # Process and save the image and initial seed latents
                         index = "0" * (len(str(num_images)) - len(str(i))) + str(i)
-                        process_and_save_expt_artifacts(
-                            model_name,
-                            [image, initial_seed_latent],
-                            self.output_dir,
-                            index,
-                        )
+
+                    # Construct experiment output artifacts
+                    output_artifact_images = {"generated_image": image}
+                    output_artifact_latents = {
+                        "generated_image_latent_seed": initial_seed_latent.detach()
+                        .cpu()
+                        .numpy()
+                    }
+                    output_artifacts = construct_artifacts(
+                        output_artifact_images, output_artifact_latents
+                    )
+                    process_and_save_expt_artifacts(
+                        output_artifacts, self.output_dir, index, self.config
+                    )
 
             case _:
                 logging.error(f"Unsupported generation type : {self.model_cfg['type']}")

@@ -1,0 +1,1 @@
+Inverting images with l2 perceptual loss and K2 population normality loss. Here the normality tests are run without standardizing the tensor

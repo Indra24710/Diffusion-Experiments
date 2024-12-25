@@ -1,0 +1,1 @@
+tuning normality weights to make sure perceptual loss decreases with steps

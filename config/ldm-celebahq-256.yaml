@@ -22,7 +22,7 @@ model:
     num_inference_steps: 50
     optimization_steps: 100
     lr: 1e-3
-    loss_threshold: 0.003
+    loss_threshold: 0.0001
     losses:
       - name: 'L1 Image loss'
         use: False
@@ -38,17 +38,16 @@ model:
         weight: 1
       - name: 'Population K2 Normality Loss'
         use: True
-        weight: 1
+        weight: 0.001
     optimizer:
       name: "adam"
       params:
         betas: [0.9, 0.999]
-        lr: 0.001
+  use_tensorboard: true
 experiment:
   expt_type: "hybrid_ddim_inversion" # ddim_inversion, hybrid_ddim_inversion, optimization_inversion
   log_root_dir: "logs"
   seed: 1000
-  use_tensorboard: true
   batch_size: 1
   shuffle_dataset: true
-  num_files: 100
+  num_files: 10
