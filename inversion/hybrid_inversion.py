@@ -39,7 +39,7 @@ class HybridDDIMInversion:
     def unconditional_hybrid_ddim_inversion(self, model_name, target_image_tensor):
         match model_name:
             case "ldm-celebahq-256":
-                # Setup for TensorBoard logging
+                # Get the initial noise tensor from vanilla DDIM inversion
                 with torch.no_grad():
                     (
                         initial_ddim_inversion_image,
@@ -52,7 +52,6 @@ class HybridDDIMInversion:
                     f"Is initial latents from DDIM Inversion normal:- {is_standard_normal_k2(initial_ddim_inversion_latents.detach().cpu())[0]}"
                 )
 
-                # Get the initial noise tensor from vanilla DDIM inversion
                 opt_latents = initial_ddim_inversion_latents.requires_grad_(True)
                 logging.info(
                     f"Is initial latents from DDIM Inversion normal after standardization:- {is_standard_normal_k2(opt_latents.detach().cpu())[0]}"
@@ -90,7 +89,6 @@ class HybridDDIMInversion:
                             f"Is latents normalized:- {is_normal}, delta:- {is_normal_delta}"
                         )
 
-                    # Get initial
                     (
                         reconstructed_image,
                         reconstructed_image_latents,
