@@ -42,10 +42,6 @@ After setting up, you can run various experiments as outlined in the Quickstart 
   -  Set expt_type to hybrid_ddim_inversion in config file.
   - `python .\scripts\start_ddim_inversion.py --config .\config\ldm-celebahq-256.yaml --expt_name ldm-celebahq-256_expt-1_hybrid-ddim-inversion`
 
-# License
-
-This project is licensed under the MIT License. See the LICENSE file for details.
-
 # Acknowledgements
 - https://github.com/huggingface
 - https://huggingface.co/CompVis/ldm-celebahq-256
